@@ -16,3 +16,32 @@ A single transaction file will be shared every month that will contain sales dat
 - Design and Implement a Data storage or Warehouse based on the reporting requirements above
 - Design an ETL for the data ingestion process. The source file will be provided monthly and need to be loaded into the data warehouse, so design the ETL in that way
 - Design the ETL for the entire process of data warehousing
+
+### Project Architecture
+
+
+| dimensions        | facts               |
+| ----------------  | ------------------- |
+| dim_customer      | fact_sales_details  |
+| dim_location      |                     |
+| dim_salesman      |                     |
+| dim_product       |                     |
+| dim_category      |                     |
+| dim_ship          |                     |
+| dim_shipcomp      |                     |
+
+
+
+StackEdit stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**
+
+
+| dim_customer| dim_location | 
+| ----------------  | ------------------- |
+| customer_id|location_id|
+| customer_name|city|
+| location_key|state|
+| created_at|region|
+| updated_at|created_at|
+| curr_ind|   updated_at|
+| |curr_ind|
+
