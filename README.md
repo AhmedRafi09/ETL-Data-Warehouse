@@ -45,3 +45,7 @@ StackEdit stores your files in your browser, which means all your files are auto
 | curr_ind|   updated_at|
 | |curr_ind|
 
+
+
+![image](https://github.com/user-attachments/assets/36a2a695-6846-40cc-8338-0dd142298e20)
+
