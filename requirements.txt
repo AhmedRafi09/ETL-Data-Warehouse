@@ -1,0 +1,6 @@
+configparser==5.2.0
+pandas==1.2.4
+psycopg2==2.9.3
+SQLAlchemy==1.4.12
+logging==0.4.9.6
+DateTime==4.3

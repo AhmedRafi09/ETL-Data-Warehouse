@@ -1,0 +1,605 @@
+2022-09-12  13:01:19,267 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 13:01:19.267424
+2022-09-12  13:01:19,267 urbanGUI INFO Reading Input File
+2022-09-12  13:01:19,699 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  13:01:19,699 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  13:01:19,699 urbanGUI INFO File Moved
+2022-09-12  13:01:19,699 urbanGUI INFO Truncating Staging Table
+2022-09-12  13:07:34,287 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 13:07:34.287280
+2022-09-12  13:07:34,287 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  13:07:34,287 urbanGUI INFO Reading Input File
+2022-09-12  13:09:28,210 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 13:09:28.210410
+2022-09-12  13:09:28,210 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  13:09:28,210 urbanGUI INFO Reading Input File
+2022-09-12  13:09:28,458 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  13:09:28,459 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  13:09:28,459 urbanGUI INFO File Moved
+2022-09-12  13:09:28,459 urbanGUI INFO Truncating Staging Table
+2022-09-12  13:10:46,937 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 13:10:46.937904
+2022-09-12  13:10:46,937 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  13:10:46,937 urbanGUI INFO Reading Input File
+2022-09-12  13:10:47,157 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  13:10:47,157 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  13:10:47,157 urbanGUI INFO File Moved
+2022-09-12  13:10:47,157 urbanGUI INFO Truncating Staging Table
+2022-09-12  13:12:35,340 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 13:12:35.340493
+2022-09-12  13:12:35,340 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  13:12:35,340 urbanGUI INFO Reading Input File
+2022-09-12  13:12:35,567 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  13:12:35,567 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  13:12:35,567 urbanGUI INFO File Moved
+2022-09-12  13:12:35,567 urbanGUI INFO Truncating Staging Table
+2022-09-12  13:12:35,634 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  13:12:35,634 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  13:12:35,637 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  13:12:35,637 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  13:12:35,638 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  13:12:35,638 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  13:12:35,639 sqlalchemy.engine.Engine INFO TRUNCATE TABLE stg_dwh.stg_fact_sales_details
+2022-09-12  13:12:35,640 sqlalchemy.engine.Engine INFO [generated in 0.00045s] {}
+2022-09-12  13:12:35,646 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  13:12:35,653 urbanGUI INFO Staging Table Truncated
+2022-09-12  13:12:35,654 urbanGUI INFO Uploading File to Staging Table
+2022-09-12  13:12:35,702 urbanGUI INFO File Uploaded
+2022-09-12  13:12:35,702 urbanGUI INFO ## Populating Dimension Start Time: 2022-09-12 13:12:35.702742
+2022-09-12  13:12:35,702 urbanGUI INFO Running DIM_CUSTOMER
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_customer;
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO [generated in 0.00044s] {}
+2022-09-12  13:12:35,757 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  13:12:35,772 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_customer (customer_id, customer_name, location_id, created_at, updated_at, curr_ind)
+                            with res as 
+                            (select distinct customer_id from stg_dwh.stg_fact_sales_details
+                            except
+                            select distinct customer_id from dwh.dim_customer)
+                            select 
+                                distinct sd.customer_id,
+                                sd.customer_name, 
+                                dl.location_id, 
+                                current_timestamp as created_at,  
+                                current_timestamp as updated_at, 
+                                1 as curr_ind
+                            from stg_dwh.stg_fact_sales_details sd
+                            join res on sd.customer_id = res.customer_id
+                            left join dwh.dim_location dl on sd.city = dl.city and sd.state = dl.state and sd.country = dl.country 
+                            ;
+2022-09-12  13:12:35,776 sqlalchemy.engine.Engine INFO [generated in 0.00409s] {}
+2022-09-12  13:12:35,785 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  13:12:35,786 sqlalchemy.engine.Engine INFO insert into dwh.dim_customer
+select * from stg_dwh.stg_dim_customer
+2022-09-12  13:12:35,786 sqlalchemy.engine.Engine INFO [generated in 0.00038s] {}
+2022-09-12  13:12:35,788 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  13:12:35,790 sqlalchemy.engine.Engine INFO insert into dwh.c_load_histrory (process_name, etl_load_date, etl_start_time, etl_end_time, etl_status, created_at, updated_at)
+                            select 
+                                'etl_dim_customer' as process_name,
+                                current_date as etl_load_date,
+                                2022-09-12 13:12:35.703976 as etl_start_time,
+                                2022-09-12 13:12:35.789200 as etl_end_time,
+                                1 as etl_status,
+                                current_timestamp as created_at,
+                                current_timestamp as updated_at;
+2022-09-12  13:12:35,794 sqlalchemy.engine.Engine INFO [generated in 0.00397s] {}
+2022-09-12  13:12:35,796 sqlalchemy.engine.Engine INFO ROLLBACK
+2022-09-12  14:08:47,635 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 14:08:47.635084
+2022-09-12  14:08:47,635 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  14:08:47,635 urbanGUI INFO Reading Input File
+2022-09-12  14:08:47,986 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  14:08:47,986 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  14:08:47,986 urbanGUI INFO File Moved
+2022-09-12  14:08:47,986 urbanGUI INFO Truncating Staging Table
+2022-09-12  14:08:48,57 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:08:48,57 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:08:48,59 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:08:48,59 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:08:48,60 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:08:48,61 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:08:48,61 sqlalchemy.engine.Engine INFO TRUNCATE TABLE stg_dwh.stg_fact_sales_details
+2022-09-12  14:08:48,61 sqlalchemy.engine.Engine INFO [generated in 0.00036s] {}
+2022-09-12  14:08:48,67 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:08:48,75 urbanGUI INFO Staging Table Truncated
+2022-09-12  14:08:48,75 urbanGUI INFO Uploading File to Staging Table
+2022-09-12  14:08:48,174 urbanGUI INFO File Uploaded
+2022-09-12  14:08:48,174 urbanGUI INFO ## Populating Dimension Start Time: 2022-09-12 14:08:48.174529
+2022-09-12  14:08:48,174 urbanGUI INFO Running DIM_CUSTOMER
+2022-09-12  14:08:48,219 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:08:48,220 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:08:48,220 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:08:48,221 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:08:48,221 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:08:48,222 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:08:48,223 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_customer;
+2022-09-12  14:08:48,223 sqlalchemy.engine.Engine INFO [generated in 0.00054s] {}
+2022-09-12  14:08:48,227 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:08:48,230 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_customer (customer_id, customer_name, location_id, created_at, updated_at, curr_ind)
+                            with res as 
+                            (select distinct customer_id from stg_dwh.stg_fact_sales_details
+                            except
+                            select distinct customer_id from dwh.dim_customer)
+                            select 
+                                distinct sd.customer_id,
+                                sd.customer_name, 
+                                dl.location_id, 
+                                current_timestamp as created_at,  
+                                current_timestamp as updated_at, 
+                                1 as curr_ind
+                            from stg_dwh.stg_fact_sales_details sd
+                            join res on sd.customer_id = res.customer_id
+                            left join dwh.dim_location dl on sd.city = dl.city and sd.state = dl.state and sd.country = dl.country 
+                            ;
+2022-09-12  14:08:48,232 sqlalchemy.engine.Engine INFO [generated in 0.00213s] {}
+2022-09-12  14:08:48,242 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:08:48,243 sqlalchemy.engine.Engine INFO insert into dwh.dim_customer
+select * from stg_dwh.stg_dim_customer
+2022-09-12  14:08:48,243 sqlalchemy.engine.Engine INFO [generated in 0.00055s] {}
+2022-09-12  14:08:48,245 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:08:48,246 sqlalchemy.engine.Engine INFO insert into dwh.c_load_histrory (process_name, etl_load_date, etl_start_time, etl_end_time, etl_status, created_at, updated_at)
+                            select 
+                                'etl_dim_customer' as process_name,
+                                current_date as etl_load_date,
+                                2022-09-12 14:08:48 as etl_start_time,
+                                2022-09-12 14:08:48 as etl_end_time,
+                                1 as etl_status,
+                                current_timestamp as created_at,
+                                current_timestamp as updated_at;
+2022-09-12  14:08:48,248 sqlalchemy.engine.Engine INFO [generated in 0.00128s] {}
+2022-09-12  14:08:48,249 sqlalchemy.engine.Engine INFO ROLLBACK
+2022-09-12  14:13:15,528 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 14:13:15.528550
+2022-09-12  14:13:15,528 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  14:13:15,528 urbanGUI INFO Reading Input File
+2022-09-12  14:13:34,457 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 14:13:34.457742
+2022-09-12  14:13:34,457 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  14:13:34,457 urbanGUI INFO Reading Input File
+2022-09-12  14:13:34,757 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  14:13:34,757 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  14:13:34,757 urbanGUI INFO File Moved
+2022-09-12  14:13:34,757 urbanGUI INFO Truncating Staging Table
+2022-09-12  14:13:34,920 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:13:34,920 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:13:34,932 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:13:34,933 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:13:34,934 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:13:34,935 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:13:34,937 sqlalchemy.engine.Engine INFO TRUNCATE TABLE stg_dwh.stg_fact_sales_details
+2022-09-12  14:13:34,937 sqlalchemy.engine.Engine INFO [generated in 0.00037s] {}
+2022-09-12  14:13:34,944 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:13:34,947 urbanGUI INFO Staging Table Truncated
+2022-09-12  14:13:34,947 urbanGUI INFO Uploading File to Staging Table
+2022-09-12  14:13:34,994 urbanGUI INFO File Uploaded
+2022-09-12  14:13:34,994 urbanGUI INFO ## Populating Dimension Start Time: 2022-09-12 14:13:34.994457
+2022-09-12  14:13:34,994 urbanGUI INFO Running DIM_CUSTOMER
+2022-09-12  14:13:35,66 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:13:35,67 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:13:35,68 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:13:35,68 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:13:35,69 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:13:35,69 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:13:35,71 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_customer;
+2022-09-12  14:13:35,71 sqlalchemy.engine.Engine INFO [generated in 0.00048s] {}
+2022-09-12  14:13:35,75 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:13:35,77 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_customer (customer_id, customer_name, location_id, created_at, updated_at, curr_ind)
+                            with res as 
+                            (select distinct customer_id from stg_dwh.stg_fact_sales_details
+                            except
+                            select distinct customer_id from dwh.dim_customer)
+                            select 
+                                distinct sd.customer_id,
+                                sd.customer_name, 
+                                dl.location_id, 
+                                current_timestamp as created_at,  
+                                current_timestamp as updated_at, 
+                                1 as curr_ind
+                            from stg_dwh.stg_fact_sales_details sd
+                            join res on sd.customer_id = res.customer_id
+                            left join dwh.dim_location dl on sd.city = dl.city and sd.state = dl.state and sd.country = dl.country 
+                            ;
+2022-09-12  14:13:35,80 sqlalchemy.engine.Engine INFO [generated in 0.00241s] {}
+2022-09-12  14:13:35,90 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:13:35,92 sqlalchemy.engine.Engine INFO insert into dwh.dim_customer
+select * from stg_dwh.stg_dim_customer
+2022-09-12  14:13:35,92 sqlalchemy.engine.Engine INFO [generated in 0.00066s] {}
+2022-09-12  14:13:35,94 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:13:35,95 sqlalchemy.engine.Engine INFO insert into dwh.c_load_histrory (process_name, etl_load_date, etl_start_time, etl_end_time, etl_status, created_at, updated_at)
+                            select 
+                                'etl_dim_customer' as process_name,
+                                current_date as etl_load_date,
+                                2022-09-12 14:13:34.994457 as etl_start_time,
+                                2022-09-12 14:13:35.094361 as etl_end_time,
+                                1 as etl_status,
+                                current_timestamp as created_at,
+                                current_timestamp as updated_at;
+2022-09-12  14:13:35,96 sqlalchemy.engine.Engine INFO [generated in 0.00157s] {}
+2022-09-12  14:13:35,100 sqlalchemy.engine.Engine INFO ROLLBACK
+2022-09-12  14:14:29,78 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 14:14:29.078245
+2022-09-12  14:14:29,78 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  14:14:29,78 urbanGUI INFO Reading Input File
+2022-09-12  14:14:29,309 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  14:14:29,309 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  14:14:29,309 urbanGUI INFO File Moved
+2022-09-12  14:14:29,309 urbanGUI INFO Truncating Staging Table
+2022-09-12  14:14:29,384 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:14:29,384 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:14:29,391 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:14:29,391 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:14:29,393 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:14:29,393 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:14:29,394 sqlalchemy.engine.Engine INFO TRUNCATE TABLE stg_dwh.stg_fact_sales_details
+2022-09-12  14:14:29,394 sqlalchemy.engine.Engine INFO [generated in 0.00052s] {}
+2022-09-12  14:14:29,397 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:14:29,400 urbanGUI INFO Staging Table Truncated
+2022-09-12  14:14:29,400 urbanGUI INFO Uploading File to Staging Table
+2022-09-12  14:14:29,461 urbanGUI INFO File Uploaded
+2022-09-12  14:14:29,461 urbanGUI INFO ## Populating Dimension Start Time: 2022-09-12 14:14:29.461524
+2022-09-12  14:14:29,461 urbanGUI INFO Running DIM_CUSTOMER
+2022-09-12  14:14:29,509 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:14:29,509 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:14:29,510 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:14:29,510 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:14:29,511 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:14:29,512 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:14:29,513 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_customer;
+2022-09-12  14:14:29,514 sqlalchemy.engine.Engine INFO [generated in 0.00126s] {}
+2022-09-12  14:14:29,520 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:14:29,524 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_customer (customer_id, customer_name, location_id, created_at, updated_at, curr_ind)
+                            with res as 
+                            (select distinct customer_id from stg_dwh.stg_fact_sales_details
+                            except
+                            select distinct customer_id from dwh.dim_customer)
+                            select 
+                                distinct sd.customer_id,
+                                sd.customer_name, 
+                                dl.location_id, 
+                                current_timestamp as created_at,  
+                                current_timestamp as updated_at, 
+                                1 as curr_ind
+                            from stg_dwh.stg_fact_sales_details sd
+                            join res on sd.customer_id = res.customer_id
+                            left join dwh.dim_location dl on sd.city = dl.city and sd.state = dl.state and sd.country = dl.country 
+                            ;
+2022-09-12  14:14:29,526 sqlalchemy.engine.Engine INFO [generated in 0.00263s] {}
+2022-09-12  14:14:29,534 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:14:29,537 sqlalchemy.engine.Engine INFO insert into dwh.dim_customer
+select * from stg_dwh.stg_dim_customer
+2022-09-12  14:14:29,537 sqlalchemy.engine.Engine INFO [generated in 0.00089s] {}
+2022-09-12  14:14:29,540 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:14:29,540 sqlalchemy.engine.Engine INFO insert into dwh.c_load_histrory (process_name, etl_load_date, etl_start_time, etl_end_time, etl_status, created_at, updated_at)
+                            select 
+                                'etl_dim_customer' as process_name,
+                                current_date as etl_load_date,
+                                2022-09-12 14:14:29.462003 as etl_start_time,
+                                2022-09-12 14:14:29.540363 as etl_end_time,
+                                1 as etl_status,
+                                current_timestamp as created_at,
+                                current_timestamp as updated_at;
+2022-09-12  14:14:29,541 sqlalchemy.engine.Engine INFO [generated in 0.00105s] {}
+2022-09-12  14:14:29,542 sqlalchemy.engine.Engine INFO ROLLBACK
+
+
+2022-09-12  14:31:11,277 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 14:31:11.277176
+2022-09-12  14:31:11,277 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  14:31:11,277 urbanGUI INFO Reading Input File
+2022-09-12  14:31:11,577 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  14:31:11,577 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  14:31:11,577 urbanGUI INFO File Moved
+2022-09-12  14:31:11,577 urbanGUI INFO Truncating Staging Table
+2022-09-12  14:31:11,643 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:31:11,643 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:31:11,659 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:31:11,660 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:31:11,661 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:31:11,661 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:31:11,663 sqlalchemy.engine.Engine INFO TRUNCATE TABLE stg_dwh.stg_fact_sales_details
+2022-09-12  14:31:11,663 sqlalchemy.engine.Engine INFO [generated in 0.00054s] {}
+2022-09-12  14:31:11,669 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:31:11,676 urbanGUI INFO Staging Table Truncated
+2022-09-12  14:31:11,677 urbanGUI INFO Uploading File to Staging Table
+2022-09-12  14:31:11,738 urbanGUI INFO File Uploaded
+2022-09-12  14:31:11,738 urbanGUI INFO ## Populating Dimension Start Time: 2022-09-12 14:31:11.738965
+2022-09-12  14:31:11,739 urbanGUI INFO Running DIM_CUSTOMER
+2022-09-12  14:31:11,895 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:31:11,895 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:31:11,896 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:31:11,896 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:31:11,897 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:31:11,897 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:31:11,898 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_customer;
+2022-09-12  14:31:11,898 sqlalchemy.engine.Engine INFO [generated in 0.00033s] {}
+2022-09-12  14:31:11,904 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:31:11,909 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_customer (customer_id, customer_name, location_id, created_at, updated_at, curr_ind)
+                            with res as 
+                            (select distinct customer_id from stg_dwh.stg_fact_sales_details
+                            except
+                            select distinct customer_id from dwh.dim_customer)
+                            select 
+                                distinct sd.customer_id,
+                                sd.customer_name, 
+                                dl.location_id, 
+                                current_timestamp as created_at,  
+                                current_timestamp as updated_at, 
+                                1 as curr_ind
+                            from stg_dwh.stg_fact_sales_details sd
+                            join res on sd.customer_id = res.customer_id
+                            left join dwh.dim_location dl on sd.city = dl.city and sd.state = dl.state and sd.country = dl.country 
+                            ;
+2022-09-12  14:31:11,911 sqlalchemy.engine.Engine INFO [generated in 0.00233s] {}
+2022-09-12  14:31:11,921 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:31:11,922 sqlalchemy.engine.Engine INFO insert into dwh.dim_customer
+select * from stg_dwh.stg_dim_customer
+2022-09-12  14:31:11,922 sqlalchemy.engine.Engine INFO [generated in 0.00042s] {}
+2022-09-12  14:31:11,923 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:31:11,924 sqlalchemy.engine.Engine INFO insert into dwh.c_load_histrory (process_name, etl_load_date, etl_start_time, etl_end_time, etl_status, created_at, updated_at)
+                            select 
+                                'etl_dim_customer' as process_name,
+                                current_date as etl_load_date,
+                                current_timestamp as etl_start_time,
+                                current_timestamp as etl_end_time,
+                                1 as etl_status,
+                                current_timestamp as created_at,
+                                current_timestamp as updated_at;
+2022-09-12  14:31:11,926 sqlalchemy.engine.Engine INFO [generated in 0.00187s] {}
+2022-09-12  14:31:11,931 sqlalchemy.engine.Engine INFO ROLLBACK
+2022-09-12  14:32:49,580 urbanGUI INFO Sales DWH ETL Start Time: 2022-09-12 14:32:49.580996
+2022-09-12  14:32:49,580 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  14:32:49,580 urbanGUI INFO Reading Input File
+2022-09-12  14:32:49,848 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  14:32:49,848 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  14:32:49,848 urbanGUI INFO File Moved
+2022-09-12  14:32:49,848 urbanGUI INFO Truncating Staging Table
+2022-09-12  14:32:49,897 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:32:49,897 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:32:49,905 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:32:49,906 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:32:49,906 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:32:49,906 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:32:49,908 sqlalchemy.engine.Engine INFO TRUNCATE TABLE stg_dwh.stg_fact_sales_details
+2022-09-12  14:32:49,908 sqlalchemy.engine.Engine INFO [generated in 0.00044s] {}
+2022-09-12  14:32:49,911 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:32:49,915 urbanGUI INFO Staging Table Truncated
+2022-09-12  14:32:49,915 urbanGUI INFO Uploading File to Staging Table
+2022-09-12  14:32:49,994 urbanGUI INFO File Uploaded
+2022-09-12  14:32:49,994 urbanGUI INFO ## Populating Dimension Start Time: 2022-09-12 14:32:49.994091
+2022-09-12  14:32:49,994 urbanGUI INFO Running DIM_CUSTOMER
+2022-09-12  14:32:50,38 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:32:50,39 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:32:50,40 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:32:50,40 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:32:50,40 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:32:50,41 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:32:50,42 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_customer;
+2022-09-12  14:32:50,42 sqlalchemy.engine.Engine INFO [generated in 0.00038s] {}
+2022-09-12  14:32:50,45 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:32:50,48 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_customer (customer_id, customer_name, location_id, created_at, updated_at, curr_ind)
+                            with res as 
+                            (select distinct customer_id from stg_dwh.stg_fact_sales_details
+                            except
+                            select distinct customer_id from dwh.dim_customer)
+                            select 
+                                distinct sd.customer_id,
+                                sd.customer_name, 
+                                dl.location_id, 
+                                current_timestamp as created_at,  
+                                current_timestamp as updated_at, 
+                                1 as curr_ind
+                            from stg_dwh.stg_fact_sales_details sd
+                            join res on sd.customer_id = res.customer_id
+                            left join dwh.dim_location dl on sd.city = dl.city and sd.state = dl.state and sd.country = dl.country 
+                            ;
+2022-09-12  14:32:50,51 sqlalchemy.engine.Engine INFO [generated in 0.00336s] {}
+2022-09-12  14:32:50,59 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:32:50,60 sqlalchemy.engine.Engine INFO insert into dwh.dim_customer
+select * from stg_dwh.stg_dim_customer
+2022-09-12  14:32:50,60 sqlalchemy.engine.Engine INFO [generated in 0.00042s] {}
+2022-09-12  14:32:50,61 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:32:50,62 sqlalchemy.engine.Engine INFO insert into dwh.c_load_histrory (process_name, etl_load_date, etl_start_time, etl_end_time, etl_status, created_at, updated_at)
+                            select 
+                                'etl_dim_customer' as process_name,
+                                current_date as etl_load_date,
+                                current_timestamp as etl_start_time,
+                                current_timestamp as etl_end_time,
+                                1 as etl_status,
+                                current_timestamp as created_at,
+                                current_timestamp as updated_at;
+2022-09-12  14:32:50,63 sqlalchemy.engine.Engine INFO [generated in 0.00118s] {}
+2022-09-12  14:32:50,73 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:32:50,74 urbanGUI INFO Sales DWH ETL End Time: 2022-09-12 14:32:50.074403
+2022-09-12  14:51:53,775 urbanGUI INFO 
+
+
+Sales DWH ETL Start Time: 2022-09-12 14:51:53.775080
+2022-09-12  14:51:53,775 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  14:51:53,775 urbanGUI INFO Reading Input File
+2022-09-12  14:51:54,90 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  14:51:54,90 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  14:51:54,90 urbanGUI INFO File Moved
+2022-09-12  14:51:54,90 urbanGUI INFO Truncating Staging Table
+2022-09-12  14:51:54,279 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:51:54,279 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:51:54,283 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:51:54,283 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:51:54,284 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:51:54,284 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:51:54,286 sqlalchemy.engine.Engine INFO TRUNCATE TABLE stg_dwh.stg_fact_sales_details
+2022-09-12  14:51:54,286 sqlalchemy.engine.Engine INFO [generated in 0.00038s] {}
+2022-09-12  14:51:54,293 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:51:54,297 urbanGUI INFO Staging Table Truncated
+2022-09-12  14:51:54,297 urbanGUI INFO Uploading File to Staging Table
+2022-09-12  14:51:54,350 urbanGUI INFO File Uploaded
+2022-09-12  14:51:54,350 urbanGUI INFO ## Populating Dimension Start Time: 2022-09-12 14:51:54.350106
+2022-09-12  14:51:54,350 urbanGUI INFO Running DIM_CUSTOMER
+2022-09-12  14:51:54,479 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:51:54,479 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:51:54,495 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:51:54,495 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:51:54,496 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:51:54,496 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:51:54,497 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_customer;
+2022-09-12  14:51:54,497 sqlalchemy.engine.Engine INFO [generated in 0.00040s] {}
+2022-09-12  14:51:54,502 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:51:54,504 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_customer (customer_id, customer_name, location_id, created_at, updated_at, curr_ind)
+                            with res as 
+                            (select distinct customer_id from stg_dwh.stg_fact_sales_details
+                            except
+                            select distinct customer_id from dwh.dim_customer)
+                            select 
+                                distinct sd.customer_id,
+                                sd.customer_name, 
+                                dl.location_id, 
+                                current_timestamp as created_at,  
+                                current_timestamp as updated_at, 
+                                1 as curr_ind
+                            from stg_dwh.stg_fact_sales_details sd
+                            join res on sd.customer_id = res.customer_id
+                            left join dwh.dim_location dl on sd.city = dl.city and sd.state = dl.state and sd.country = dl.country 
+                            ;
+2022-09-12  14:51:54,506 sqlalchemy.engine.Engine INFO [generated in 0.00185s] {}
+2022-09-12  14:51:54,508 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:51:54,514 sqlalchemy.engine.Engine INFO insert into dwh.dim_customer
+select * from stg_dwh.stg_dim_customer
+2022-09-12  14:51:54,514 sqlalchemy.engine.Engine INFO [generated in 0.00051s] {}
+2022-09-12  14:51:54,514 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:51:54,518 sqlalchemy.engine.Engine INFO insert into dwh.c_load_histrory (process_name, etl_load_date, etl_start_time, etl_end_time, etl_status, created_at, updated_at)
+                            select 
+                                'etl_dim_customer' as process_name,
+                                current_date as etl_load_date,
+                                current_timestamp as etl_start_time,
+                                current_timestamp as etl_end_time,
+                                1 as etl_status,
+                                current_timestamp as created_at,
+                                current_timestamp as updated_at;
+2022-09-12  14:51:54,518 sqlalchemy.engine.Engine INFO [generated in 0.00093s] {}
+2022-09-12  14:51:54,528 sqlalchemy.engine.Engine INFO ROLLBACK
+2022-09-12  14:53:10,170 urbanGUI INFO 
+
+
+Sales DWH ETL Start Time: 2022-09-12 14:53:10.170289
+2022-09-12  14:53:10,170 urbanGUI INFO Loading Input File Into Staging Table
+2022-09-12  14:53:10,170 urbanGUI INFO Reading Input File
+2022-09-12  14:53:10,497 urbanGUI INFO File Read Complete & CSV Prepared to Upload
+2022-09-12  14:53:10,497 urbanGUI INFO Moving Input File to Backup Folder
+2022-09-12  14:53:10,497 urbanGUI INFO File Moved
+2022-09-12  14:53:10,497 urbanGUI INFO Truncating Staging Table
+2022-09-12  14:53:10,546 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:53:10,546 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,555 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:53:10,556 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,558 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:53:10,558 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,560 sqlalchemy.engine.Engine INFO TRUNCATE TABLE stg_dwh.stg_fact_sales_details
+2022-09-12  14:53:10,560 sqlalchemy.engine.Engine INFO [generated in 0.00056s] {}
+2022-09-12  14:53:10,564 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,568 urbanGUI INFO Staging Table Truncated
+2022-09-12  14:53:10,568 urbanGUI INFO Uploading File to Staging Table
+2022-09-12  14:53:10,638 urbanGUI INFO File Uploaded
+2022-09-12  14:53:10,638 urbanGUI INFO ## Populating Dimension Start Time: 2022-09-12 14:53:10.638255
+2022-09-12  14:53:10,638 urbanGUI INFO Running DIM_CUSTOMER
+2022-09-12  14:53:10,680 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:53:10,681 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,682 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:53:10,682 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,683 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:53:10,683 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,683 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_customer;
+2022-09-12  14:53:10,684 sqlalchemy.engine.Engine INFO [generated in 0.00036s] {}
+2022-09-12  14:53:10,689 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,691 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_customer (customer_id, customer_name, location_id, created_at, updated_at, curr_ind)
+                            with res as 
+                            (select distinct customer_id from stg_dwh.stg_fact_sales_details
+                            except
+                            select distinct customer_id from dwh.dim_customer)
+                            select 
+                                distinct sd.customer_id,
+                                sd.customer_name, 
+                                dl.location_id, 
+                                current_timestamp as created_at,  
+                                current_timestamp as updated_at, 
+                                1 as curr_ind
+                            from stg_dwh.stg_fact_sales_details sd
+                            join res on sd.customer_id = res.customer_id
+                            left join dwh.dim_location dl on sd.city = dl.city and sd.state = dl.state and sd.country = dl.country 
+                            ;
+2022-09-12  14:53:10,693 sqlalchemy.engine.Engine INFO [generated in 0.00205s] {}
+2022-09-12  14:53:10,698 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,699 sqlalchemy.engine.Engine INFO insert into dwh.dim_customer
+select * from stg_dwh.stg_dim_customer
+2022-09-12  14:53:10,700 sqlalchemy.engine.Engine INFO [generated in 0.00031s] {}
+2022-09-12  14:53:10,701 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,702 sqlalchemy.engine.Engine INFO insert into dwh.c_load_histrory (process_name, etl_load_date, etl_start_time, etl_end_time, etl_status, created_at, updated_at)
+                            select 
+                                'etl_dim_customer' as process_name,
+                                current_date as etl_load_date,
+                                current_timestamp as etl_start_time,
+                                current_timestamp as etl_end_time,
+                                1 as etl_status,
+                                current_timestamp as created_at,
+                                current_timestamp as updated_at;
+2022-09-12  14:53:10,704 sqlalchemy.engine.Engine INFO [generated in 0.00258s] {}
+2022-09-12  14:53:10,708 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,708 urbanGUI INFO Running DIM_LOCATION
+2022-09-12  14:53:10,758 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:53:10,759 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,759 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:53:10,760 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,760 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:53:10,760 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,761 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_location;
+2022-09-12  14:53:10,761 sqlalchemy.engine.Engine INFO [generated in 0.00027s] {}
+2022-09-12  14:53:10,765 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,767 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_location (location_id, city, state, country, created_at, updated_at, curr_ind)
+                                        with res as 
+                                        (select distinct REPLACE(city, ' ', '_') || '_' || state || '_' ||  country as location_id from stg_dwh.stg_fact_sales_details
+                                        except
+                                        select distinct location_id from dwh.dim_location)
+                                        select 
+                                            distinct REPLACE(sd.city, ' ', '_') || '_' || sd.state || '_' ||  sd.country as location_id,
+                                            sd.city,
+                                            sd.state, 
+                                            sd.country,
+                                            current_timestamp as created_at,  
+                                            current_timestamp as updated_at, 
+                                            1 as curr_ind
+                                        from stg_dwh.stg_fact_sales_details sd
+                                        join res on REPLACE(sd.city, ' ', '_') || '_' || sd.state || '_' ||  sd.country = res.location_id
+                                        ;
+2022-09-12  14:53:10,769 sqlalchemy.engine.Engine INFO [generated in 0.00258s] {}
+2022-09-12  14:53:10,778 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,779 sqlalchemy.engine.Engine INFO insert into dwh.dim_location
+select * from stg_dwh.stg_dim_location
+2022-09-12  14:53:10,779 sqlalchemy.engine.Engine INFO [generated in 0.00065s] {}
+2022-09-12  14:53:10,780 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,781 urbanGUI INFO Running DIM_PRODUCT
+2022-09-12  14:53:10,826 sqlalchemy.engine.Engine INFO select version()
+2022-09-12  14:53:10,827 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,827 sqlalchemy.engine.Engine INFO select current_schema()
+2022-09-12  14:53:10,828 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,828 sqlalchemy.engine.Engine INFO show standard_conforming_strings
+2022-09-12  14:53:10,829 sqlalchemy.engine.Engine INFO [raw sql] {}
+2022-09-12  14:53:10,829 sqlalchemy.engine.Engine INFO truncate table stg_dwh.stg_dim_location;
+2022-09-12  14:53:10,830 sqlalchemy.engine.Engine INFO [generated in 0.00031s] {}
+2022-09-12  14:53:10,833 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,836 sqlalchemy.engine.Engine INFO insert into stg_dwh.stg_dim_location (location_id, city, state, country, created_at, updated_at, curr_ind)
+                                        with res as 
+                                        (select distinct REPLACE(city, ' ', '_') || '_' || state || '_' ||  country as location_id from stg_dwh.stg_fact_sales_details
+                                        except
+                                        select distinct location_id from dwh.dim_location)
+                                        select 
+                                            distinct REPLACE(sd.city, ' ', '_') || '_' || sd.state || '_' ||  sd.country as location_id,
+                                            sd.city,
+                                            sd.state, 
+                                            sd.country,
+                                            current_timestamp as created_at,  
+                                            current_timestamp as updated_at, 
+                                            1 as curr_ind
+                                        from stg_dwh.stg_fact_sales_details sd
+                                        join res on REPLACE(sd.city, ' ', '_') || '_' || sd.state || '_' ||  sd.country = res.location_id
+                                        ;
+2022-09-12  14:53:10,839 sqlalchemy.engine.Engine INFO [generated in 0.00316s] {}
+2022-09-12  14:53:10,843 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,844 sqlalchemy.engine.Engine INFO insert into dwh.dim_location
+select * from stg_dwh.stg_dim_location
+2022-09-12  14:53:10,845 sqlalchemy.engine.Engine INFO [generated in 0.00081s] {}
+2022-09-12  14:53:10,846 sqlalchemy.engine.Engine INFO COMMIT
+2022-09-12  14:53:10,846 urbanGUI INFO ## Dimension Process End Time: 2022-09-12 14:53:10.846693
+2022-09-12  14:53:10,846 urbanGUI INFO Sales DWH ETL End Time: 2022-09-12 14:53:10.846693
