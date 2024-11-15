@@ -17,7 +17,7 @@ A single transaction file will be shared every month that will contain sales dat
 - Design an ETL for the data ingestion process. The source file will be provided monthly and need to be loaded into the data warehouse, so design the ETL in that way
 - Design the ETL for the entire process of data warehousing
 
-### Project Architecture
+### Database components
 
 
 | dimensions        | facts               |
@@ -46,6 +46,7 @@ StackEdit stores your files in your browser, which means all your files are auto
 | |curr_ind|
 
 
+### Overall Project Architecture
 
 ![image](https://github.com/user-attachments/assets/36a2a695-6846-40cc-8338-0dd142298e20)
 
